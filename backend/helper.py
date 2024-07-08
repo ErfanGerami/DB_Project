@@ -33,8 +33,11 @@ def generate_jwt_token(username,password):
 def authenticate(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        print(payload)
-        return payload
+
+        row=execute("select * from users where password=%s  and username=%s ",[payload["password"],payload["username"]]);
+        if(len(row)!=1):
+            return None
+        return row[0][0]
     except jwt.ExpiredSignatureError:
         return None
     except jwt.InvalidTokenError:
@@ -47,4 +50,7 @@ def execute(query:str,params):
             rows = cursor.fetchall()
     return rows
     
-    
+
+     
+     
+     

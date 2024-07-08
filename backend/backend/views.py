@@ -10,9 +10,12 @@ from helper import *
 
 from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 
 def testView(request):
+    print(authenticate(request.POST["token"]))
 
+    
     mess=list()
     resp=dict()
     with connection.cursor() as cursor:
