@@ -25,6 +25,15 @@ from .settings import SECRET_KEY,EXPIRATION_TIME
 from .views import *          
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('test',testView),
-    path('auth/token',generateTokenView),
+    path('auth/login',login),
+    path('auth/register',register),
+    path('test',Test.as_view()),
+    path('musics',Musics.as_view()),
+    path('musics/<int:pk>',Music.as_view()),
+    path('concerts',Conecrts.as_view()),
+    path('concerts/<int:pk>',Concert.as_view()),
+    path('singer/album/<int:album_pk>',SingerAlbum.as_view()),
+    path('album/<int:album_pk>',SingerAlbum.as_view()),
+    path('playlists/<int:playlist_pk>',PlayList.as_view()),
+
 ]
