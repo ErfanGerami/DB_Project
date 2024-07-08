@@ -1,6 +1,7 @@
 import jwt
 from datetime import datetime, timedelta
 from backend.settings import SECRET_KEY,EXPIRATION_TIME
+from django.db import connection
 
 def serialize(inp:list,desc:tuple):
     resp=list()
@@ -39,4 +40,11 @@ def authenticate(token):
     except jwt.InvalidTokenError:
         return None
      
-     
+def execute(query:str,params):
+    rows=list()
+    with connection.cursor() as cursor:
+            cursor.execute(query,params)
+            rows = cursor.fetchall()
+    return rows
+    
+    
