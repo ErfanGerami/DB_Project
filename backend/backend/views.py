@@ -11,15 +11,17 @@ from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from .mixin import AuthorizationMixin
-  
+import json
 from django.utils.decorators import method_decorator
 
 
 @api_view(['POST'])
 def login(request:HttpRequest):
     if(request.method=='POST'):
-        username=request.POST["username"]
-        password=request.POST["password"]
+        data = json.loads(request.body)
+        
+        username=data.get("username")
+        password=data.get("password")
         
         hashed_pass=hash(password)
         print(username,hashed_pass)
@@ -35,14 +37,17 @@ def login(request:HttpRequest):
 @api_view(['POST'])
 @csrf_exempt
 def register(request):
-    stat,field=check(request.POST,"password","username","email","birthdate","address")
+    data = json.loads(request.body)
+        
+    
+    stat,field=check(data,"password","username","email","birthdate","address")
     if( not stat):
         print(field)
         return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
     try:
         post=request.POST
         execute("insert into users(username,password,email,birthdate,address) values(%s,%s,%s,%s,%s)",
-                [post["username"],hash(post["password"]),post["email"],post["birthdate"],post["address"]],False,True)
+                [data["username"],hash(data["password"]),data["email"],data["birthdate"],data["address"]],False,True)
                 
         return JsonResponse({ "message":"register successful"},status=status.HTTP_200_OK)
     except Exception as e:
