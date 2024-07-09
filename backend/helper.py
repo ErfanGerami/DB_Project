@@ -49,13 +49,17 @@ def execute(query:str,params=None,get_result=True,commit=False):
     desc=list()
     with connection.cursor() as cursor:
             cursor.execute(query,params)
-            desc=[col[0] for col in cursor.description]
+            if(get_result):
+                desc=[col[0] for col in cursor.description]
             
             if(get_result):
                 rows = cursor.fetchall()
             if(commit):
-                 connection.commit()        
-    return [desc,list(rows)]    
+                 connection.commit() 
+    if(get_result):       
+        return [desc,list(rows)]    
+    else:
+         return None
    
     
 def check(dic,*args):
