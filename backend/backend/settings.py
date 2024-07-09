@@ -36,6 +36,8 @@ CORS_ALLOWED_ORIGINS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
+
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,6 +56,7 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
