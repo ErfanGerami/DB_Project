@@ -109,3 +109,10 @@ class UserPlaylist(AuthorizationMixin,APIView):
         data=execute(" select * from playlists where owner_id = %s",[str(request.COOKIES["id"])])
         return JsonResponse(serialize(data[0],data[1]),safe=False)
     
+
+class UserPredictions(AuthorizationMixin,APIView):
+    def get(self,request):
+        data=execute("select * from get_predictions(%s);",[str(request.COOKIES["id"])])
+        l=serialize(data[0],data[1])
+        return JsonResponse(sorted(l, key=lambda x: x['rank']),safe=False)
+    
