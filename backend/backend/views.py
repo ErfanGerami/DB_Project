@@ -99,17 +99,19 @@ class AlbumSong(AuthorizationMixin, APIView):
         data=execute("select * from musics where album_id = %s;",[str(album_pk)])
         return JsonResponse(serialize(data[0],data[1]),safe=False)
     
-class PlayList(AuthorizationMixin,APIView):
-    def get(self,request,playlist_pk):
-        data=execute(" select * from get_musics_in_playlist(%s)",[str(playlist_pk)])
-        return JsonResponse(serialize(data[0],data[1]),safe=False)
-    
+
 class UserPlaylist(AuthorizationMixin,APIView):
     def get(self,request):
-        data=execute(" select * from playlists where owner_id = %s",[str(request.COOKIES["id"])])
+        data=execute(" select * from get_users_playlists(%s)",[str(request.COOKIES["id"])])
+        
         return JsonResponse(serialize(data[0],data[1]),safe=False)
     
-
+class Playlist(AuthorizationMixin,APIView):
+    def get(self,request,playlist_id):
+        data=execute("select * from get_users_playlists((select owner_id from playlists where playlists.id=%s)) where  id=%s",[playlist_id,playlist_id])
+        
+        return JsonResponse(serialize(data[0],data[1]),safe=False)
+    
 class UserPredictions(AuthorizationMixin,APIView):
     def get(self,request):
         data=execute("select * from get_predictions(%s);",[str(request.COOKIES["id"])])
