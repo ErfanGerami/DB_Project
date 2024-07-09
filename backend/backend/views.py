@@ -25,12 +25,22 @@ def login(request:HttpRequest):
         
         hashed_pass=hash(password)
         print(username,hashed_pass)
+
         row=execute("select * from users where password=%s  and username=%s ",[hashed_pass,username])[1]
+        id=row[0][0]
+        email=row[0][2]
+        birthdate=row[0][3]
+        address=row[0][4]
+        has_membership=row[0][5]
+        money=int(row[0][6])
+        is_singer=row[0][7]
+
+
         if(len(row)!=1):
             return JsonResponse({"error":"no such user"},status=status.HTTP_400_BAD_REQUEST)
         
 
-        return JsonResponse({'token':generate_jwt_token(username,hashed_pass)},status=200)
+        return JsonResponse({'token':generate_jwt_token(username,hashed_pass,id,email,birthdate,address,has_membership,money,is_singer)},status=200)
     return JsonResponse({"message":"get method is not supported"},status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -81,8 +91,8 @@ class Music( AuthorizationMixin,APIView):
         return JsonResponse(serialize_one(data[0],data[1]),safe=False)
 
 class SingerAlbum(AuthorizationMixin,APIView):
-    def get(self,request,album_pk):
-        data=execute("select * from musics where album_id = %s;",[str(album_pk)])
+    def get(self,request,singer_pk):
+        data=execute("select * from albums where singer_id = %s;",[str(singer_pk)])
         return JsonResponse(serialize(data[0],data[1]),safe=False)
 class AlbumSong(AuthorizationMixin, APIView):
     def get(self,request,album_pk):
@@ -94,4 +104,8 @@ class PlayList(AuthorizationMixin,APIView):
         data=execute(" select * from get_musics_in_playlist(%s)",[str(playlist_pk)])
         return JsonResponse(serialize(data[0],data[1]),safe=False)
     
- 
+class UserPlaylist(AuthorizationMixin,APIView):
+    def get(self,request):
+        data=execute(" select * from playlists where owner_id = %s",[str(request.COOKIES["id"])])
+        return JsonResponse(serialize(data[0],data[1]),safe=False)
+    

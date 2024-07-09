@@ -20,12 +20,19 @@ def serialize_one(desc,inp:tuple):
     for i in range(len(desc)):
             resp[desc[i]]=inp[0][i]
     return resp
-def generate_jwt_token(username,password):
+def generate_jwt_token(username,password,id,email,birthdate,address,has_membership,money,is_singer):
     expiration = datetime.utcnow() + EXPIRATION_TIME
     payload = {
+        'id':str(id),
+        'email':email,
+        'birthdate':str(birthdate),
+        'address':address,
+        'has_membership':str(has_membership),
+        'money':str(money),
+        'is_singer':str(is_singer),
         'username': username,
         'exp': expiration,
-        'password':password
+        
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
     return token

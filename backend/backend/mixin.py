@@ -21,12 +21,13 @@ class AuthorizationMixin:
                 if token_type.lower() == 'bearer':
                     try:
                             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+                            print(payload)
                     except jwt.ExpiredSignatureError:
                         return JsonResponse({"message": "token expired"}, status=401)
                     except jwt.InvalidTokenError:
                         return JsonResponse({"message": "invalid token"}, status=401)
-                    rows = execute("SELECT * FROM users WHERE password=%s AND username=%s", [payload.get("password"), payload.get("username")])
-                    print(rows)
+                    rows = execute("SELECT * FROM users WHERE  username=%s", [payload.get("username")])
+                    print(rows[1])
                     if len(rows[1]) != 1:
 
                         return JsonResponse({"message": "User not found or multiple users found"}, status=401)
