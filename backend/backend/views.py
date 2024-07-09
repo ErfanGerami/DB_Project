@@ -59,28 +59,28 @@ class Test(AuthorizationMixin, APIView):
         # Your logic here
         return JsonResponse({"user": request.COOKIES["username"]})
     
-class Conecrts( APIView):
+class Conecrts(AuthorizationMixin,APIView):
     def get(self,request):
         data=execute("select * from Concerts")
         return JsonResponse(serialize(data[0],data[1]),safe=False)
-class Concert( APIView):
+class Concert(AuthorizationMixin,APIView):
      def get(self,request,pk):
         data=execute("select * from concerts where id = %s;",[str(pk)])
         print(data)
         return JsonResponse(serialize_one(data[0],data[1]),safe=False)
      
 
-class Musics( APIView):
+class Musics(AuthorizationMixin,APIView):
     def get(self,request):
         data=execute("select * from musics")
     
         return JsonResponse(serialize(data[0],data[1]),safe=False)
-class Music( APIView):
+class Music( AuthorizationMixin,APIView):
     def get(self,request,pk):
         data=execute("select * from musics where id = %s;",[str(pk)])
         return JsonResponse(serialize_one(data[0],data[1]),safe=False)
 
-class SingerAlbum( APIView):
+class SingerAlbum(AuthorizationMixin,APIView):
     def get(self,request,album_pk):
         data=execute("select * from musics where album_id = %s;",[str(album_pk)])
         return JsonResponse(serialize(data[0],data[1]),safe=False)
@@ -89,7 +89,7 @@ class AlbumSong(AuthorizationMixin, APIView):
         data=execute("select * from musics where album_id = %s;",[str(album_pk)])
         return JsonResponse(serialize(data[0],data[1]),safe=False)
     
-class PlayList( APIView):
+class PlayList(AuthorizationMixin,APIView):
     def get(self,request,playlist_pk):
         data=execute(" select * from get_musics_in_playlist(%s)",[str(playlist_pk)])
         return JsonResponse(serialize(data[0],data[1]),safe=False)
