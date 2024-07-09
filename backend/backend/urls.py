@@ -36,6 +36,8 @@ urlpatterns = [
     path('album/<int:album_pk>',SingerAlbum.as_view()),
     path('playlists/<int:playlist_pk>',PlayList.as_view()),
     path('playlist/user',UserPlaylist.as_view()),
-    path('userpredictions',UserPredictions.as_view())
+    path('userpredictions',UserPredictions.as_view()),
+    path("addplaylist",AddPLaylist.as_view()),
+    path("addtoplaylist",AddToPLaylist.as_view())
 
 ]

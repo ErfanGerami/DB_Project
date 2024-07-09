@@ -116,3 +116,24 @@ class UserPredictions(AuthorizationMixin,APIView):
         l=serialize(data[0],data[1])
         return JsonResponse(sorted(l, key=lambda x: x['rank']),safe=False)
     
+
+class AddPLaylist(AuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+        try:
+            data=json.loads(request.body)
+
+            data=execute("insert into playlists(owner_id,name) values(%s,%s)",[str(request.COOKIES["id"]),str(data.get("playlist_name"))],False,True)
+            return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+class AddToPLaylist(AuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+        try:
+
+            data=json.loads(request.body)
+            data=execute("insert into playlist_music values(%s,%s)",[str(data.get("music_id")),str(data.get("playlist_id"))],False,True)
+            return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
