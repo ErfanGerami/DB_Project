@@ -29,7 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
-
+MEDIA_ROOT = BASE_DIR/ 'media'
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024
 # Alternatively, specify allowed origins
 
 

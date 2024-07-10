@@ -10,10 +10,11 @@ from helper import *
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-from .mixin import AuthorizationMixin
+from .mixin import AuthorizationMixin,SingerAuthorizationMixin
 import json
 from django.utils.decorators import method_decorator
-
+import os
+from .settings import MEDIA_ROOT,MAX_UPLOAD_SIZE
 
 @api_view(['POST'])
 def login(request:HttpRequest):
@@ -145,4 +146,57 @@ class AddToPLaylist(AuthorizationMixin,APIView):
             return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+class AddAlbum(SingerAuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+        try:
+            data=json.loads(request.body)
+            stat,field=check(data,"name")
+            if( not stat):
+                return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+            execute("insert into albums(singer_id,name) values (%s,%s)",[request.COOKIES["id"],data["name"]],False,True)
+            return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+ 
+class AddMusic(SingerAuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+            id=execute("select MAX(id) from musics")[1][0][0]+1
+            file_path=None
+            
+            post=request.POST
+            stat,field=check(post,"name","album_id","rangeage","text","genre")
+            if( not stat):
+                return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+            if 'file' in request.FILES:
+                
+                
+                song_file = request.FILES['file']
+                if song_file.size > MAX_UPLOAD_SIZE:
+                    return JsonResponse({'message':'File size exceeds the maximum limit of 5 MB.'},status.HTTP_400_BAD_REQUEST)
+
+                file_extension = os.path.splitext(song_file.name)[1]
+                file_path=str(id)+file_extension
+                save_path = os.path.join(MEDIA_ROOT, 'musics',file_path)
+                
+                
+                
+                with open(save_path, 'wb+') as destination:
+                    for chunk in song_file.chunks():
+                        destination.write(chunk)
+                return JsonResponse({ "message":"uploaded successful"},status=status.HTTP_200_OK)
+            can_add=True
+            if("can_add_to_playlist" in post and not post["can_add_to_playlist" ]):
+                can_add=False
+                
+            execute("insert into musics(id,album_id,name,genre,rangeage,image_url,can_add_to_playlist,text) values(%s,%s,%s,%s,%s,%s,%s,%s)",
+                        [id,post["album_id"],post["name"],post["genre"],post["rangeage"],file_path,can_add,post["text"]],False,True)
+           
+            return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
+        #except Exception as e:
+         #   return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+            
+            
+
         

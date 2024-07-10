@@ -39,5 +39,7 @@ urlpatterns = [
     path('userpredictions',UserPredictions.as_view()),
     path("addplaylist",AddPLaylist.as_view()),
     path("addtoplaylist",AddToPLaylist.as_view()),
+    path("singer/addmusic",AddMusic.as_view()),#file#album_id,name,genre,rangeage,image_url,text,can_add_to_playlist:optional
+    path("singer/addalbum",AddAlbum.as_view())#name
 
 ]
