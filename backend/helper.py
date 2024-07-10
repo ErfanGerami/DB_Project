@@ -79,3 +79,12 @@ def hash(data):
     hash_object = hashlib.sha256()
     hash_object.update(data.encode('utf-8'))
     return hash_object.hexdigest()
+
+
+def change(data,table1_attrib:str,table2:str,table2_atttribs:str):
+    for i in data:
+        i[table1_attrib]=execute(f"select  {table2_atttribs} from {table2} where id={i[table1_attrib]}")[1][0][0]
+    return data
+     
+     
+     

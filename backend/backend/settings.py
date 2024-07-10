@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
+
 MEDIA_ROOT = BASE_DIR/ 'media'
 MAX_UPLOAD_SIZE = 10 * 1024 * 1024
 # Alternatively, specify allowed origins
@@ -145,4 +146,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #mine------------------------------
-EXPIRATION_TIME=timedelta(minutes=30)
+EXPIRATION_TIME=timedelta(minutes=100000)
