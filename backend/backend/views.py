@@ -118,7 +118,7 @@ class UserPredictions(AuthorizationMixin,APIView):
         data=execute("select * from get_predictions(%s);",[str(request.COOKIES["id"])])
         l=serialize(data[0],data[1])
 
-        return JsonResponse(change(sorted(l, key=lambda x: x['rank']),"singer_id","users","username"),safe=False)
+        return JsonResponse(change(sorted(l, key=lambda x: x['rank']),"singer_name","singer_id","users","username"),safe=False)
     
 
 class AddPLaylist(AuthorizationMixin,APIView):
