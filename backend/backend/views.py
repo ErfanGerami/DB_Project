@@ -89,6 +89,7 @@ class Musics(AuthorizationMixin,APIView):
 class Music( AuthorizationMixin,APIView):
     def get(self,request,pk):
         data=execute("select * from musics where id = %s;",[str(pk)])
+        
         return JsonResponse(serialize_one(data[0],data[1]),safe=False)
 
 class SingerAlbum(AuthorizationMixin,APIView):
@@ -235,7 +236,7 @@ class CanAddToPlaylist(SingerAuthorizationMixin,APIView):
 
 
 
-class LikeMusic(SingerAuthorizationMixin,APIView):
+class LikeMusic(AuthorizationMixin,APIView):
     def post(self,request:HttpRequest):
         data=json.loads(request.body)
         stat,field=check(data,"music_id")
@@ -257,7 +258,7 @@ class LikeMusic(SingerAuthorizationMixin,APIView):
             return JsonResponse({ "message":"disliked"},status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
-class AllLikes(SingerAuthorizationMixin,APIView):
+class AllLikes(AuthorizationMixin,APIView):
     def get(self,request:HttpRequest):
         try:
             musics_query=execute("select image_url,musics.name,singer_id,music_id from musics,musiclikes,albums where albums.id=musics.album_id and  musiclikes.music_id=musics.id and musiclikes.user_id=%s",[request.COOKIES["id"]])
