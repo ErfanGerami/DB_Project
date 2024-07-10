@@ -44,6 +44,8 @@ urlpatterns = [
     path("singer/addalbum",AddAlbum.as_view()),#name
     path("singer/setaddtoplaylist/true",CanAddToPlaylist.as_view()),#music_id
     path("singer/setaddtoplaylist/false",CanAddToPlaylist.as_view()),#music_id
+    path("likes/all",AllLikes.as_view()),
+    path("like",LikeMusic.as_view())
     
 
 

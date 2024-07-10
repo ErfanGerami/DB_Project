@@ -15,7 +15,7 @@ import json
 from django.utils.decorators import method_decorator
 import os
 from .settings import MEDIA_ROOT,MAX_UPLOAD_SIZE
-
+from .db import *
 @api_view(['POST'])
 def login(request:HttpRequest):
     if(request.method=='POST'):
@@ -120,13 +120,19 @@ class PlaylistMusics(AuthorizationMixin,APIView):
         musics_query=execute("select image_url,musics.name,singer_id,music_id from musics,playlist_music,albums where musics.id=music_id and albums.id=musics.album_id and playlist_id=%s",[playlist_id])
         l["musics"]=change(serialize(musics_query[0],musics_query[1]),
                            "singer_name","singer_id","users","username")
-        print(l["musics"])
+        for i in l["musics"]:
+            print(i)
+            i["liked"]=get_liked(i["music_id"],request.COOKIES["id"])
+        #for i in l["musics"]:
+
         return JsonResponse(l,safe=False)
 
 class UserPredictions(AuthorizationMixin,APIView):
     def get(self,request):
         data=execute("select * from get_predictions(%s);",[str(request.COOKIES["id"])])
         l=serialize(data[0],data[1])
+        for i in l:
+                i["liked"]=get_liked(i["music_id"],request.COOKIES["id"])
 
         return JsonResponse(change(sorted(l, key=lambda x: x['rank']),"singer_name","singer_id","users","username"),safe=False)
     
@@ -229,5 +235,40 @@ class CanAddToPlaylist(SingerAuthorizationMixin,APIView):
 
 
 
-
+class LikeMusic(SingerAuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"music_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("insert into musiclikes(music_id,user_id) values(%s,%s)",[data["music_id"],request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"liked"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
         
+    def delete(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"music_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("delete from musiclikes  where music_id=%s and user_id=%s",[data["music_id"],request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"disliked"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+class AllLikes(SingerAuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            musics_query=execute("select image_url,musics.name,singer_id,music_id from musics,musiclikes,albums where albums.id=musics.album_id and  musiclikes.music_id=musics.id and musiclikes.user_id=%s",[request.COOKIES["id"]])
+            musics=change(serialize(musics_query[0],musics_query[1]),
+                           "singer_name","singer_id","users","username")
+            
+            for i in musics:
+                i["liked"]=get_liked(i["music_id"],request.COOKIES["id"])
+            return JsonResponse(musics,safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+
+
