@@ -161,6 +161,7 @@ class AddAlbum(SingerAuthorizationMixin,APIView):
  
 class AddMusic(SingerAuthorizationMixin,APIView):
     def post(self,request:HttpRequest):
+        try:
             id=execute("select MAX(id) from musics")[1][0][0]+1
             file_path=None
             
@@ -173,7 +174,7 @@ class AddMusic(SingerAuthorizationMixin,APIView):
                 
                 song_file = request.FILES['file']
                 if song_file.size > MAX_UPLOAD_SIZE:
-                    return JsonResponse({'message':'File size exceeds the maximum limit of 5 MB.'},status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse({'message':'File size exceeds the maximum limit of 5 MB.'},status=status.HTTP_400_BAD_REQUEST)
 
                 file_extension = os.path.splitext(song_file.name)[1]
                 file_path=str(id)+file_extension
@@ -193,10 +194,29 @@ class AddMusic(SingerAuthorizationMixin,APIView):
                         [id,post["album_id"],post["name"],post["genre"],post["rangeage"],file_path,can_add,post["text"]],False,True)
            
             return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
-        #except Exception as e:
-         #   return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
 
             
-            
+class CanAddToPlaylist(SingerAuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"music_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if(int(execute("select * from get_singer_id(%s)",[data["music_id"]])[1][0][0])!=request.COOKIES["id"]):
+                return JsonResponse({'message':'not this singers music'},status=status.HTTP_400_BAD_REQUEST)
+            set_true=True
+            if(request.path.split("/")[-1]=="false"):
+                set_true=False
+            execute("update musics set can_add_to_playlist =%s where id=%s",[set_true,request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"altered successfully"},status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
         

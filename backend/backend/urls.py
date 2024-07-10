@@ -40,6 +40,9 @@ urlpatterns = [
     path("addplaylist",AddPLaylist.as_view()),
     path("addtoplaylist",AddToPLaylist.as_view()),
     path("singer/addmusic",AddMusic.as_view()),#file#album_id,name,genre,rangeage,image_url,text,can_add_to_playlist:optional
-    path("singer/addalbum",AddAlbum.as_view())#name
+    path("singer/addalbum",AddAlbum.as_view()),#name
+    path("singer/setaddtoplaylist/true",CanAddToPlaylist.as_view()),#music_id
+    path("singer/setaddtoplaylist/false",CanAddToPlaylist.as_view())#music_id
+
 
 ]
