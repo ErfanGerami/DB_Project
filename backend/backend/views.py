@@ -123,6 +123,10 @@ class AddPLaylist(AuthorizationMixin,APIView):
     def post(self,request:HttpRequest):
         try:
             data=json.loads(request.body)
+            stat,field=check(data,"playlist_name")
+            if( not stat):
+                
+                return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
 
             data=execute("insert into playlists(owner_id,name) values(%s,%s)",[str(request.COOKIES["id"]),str(data.get("playlist_name"))],False,True)
             return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
@@ -134,6 +138,9 @@ class AddToPLaylist(AuthorizationMixin,APIView):
         try:
 
             data=json.loads(request.body)
+            if(len(execute("select * from playlists where id= %s and owner_id=%s ",[str(data.get("playlist_id")),request.COOKIES["id"]])[1])!=1):
+                return JsonResponse({ "message":"user doesnt have a playlist with that id"},status=status.HTTP_400_BAD_REQUEST)
+
             data=execute("insert into playlist_music values(%s,%s)",[str(data.get("music_id")),str(data.get("playlist_id"))],False,True)
             return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
         except Exception as e:
