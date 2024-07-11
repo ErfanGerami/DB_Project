@@ -4,11 +4,11 @@ from django.http import HttpRequest
 def music_modifier(dic:dict,request:HttpRequest)->dict:
     dic["singer_name"]=execute("select username from musics,albums,users where users.id=albums.singer_id and musics.album_id=albums.id")[1][0][0]
     if(dic["image_url"]):
-        dic["image_url"]=request.get_host()+dic["image_url"]
+        dic["image_url"]="http://"+request.get_host()+dic["image_url"]
     else:
         dic["image_url"]=None
     if("audio_url" in dic and dic["audio_url"]):
-        dic["audio_url"]=request.get_host()+dic["audio_url"]
+        dic["audio_url"]="http://"+request.get_host()+dic["audio_url"]
     else:
         dic["audio_url"]=None
     dic["liked"]=bool(len(execute("select * from musiclikes where music_id=%s and user_id=%s ",[dic["id"],request.COOKIES["id"]])[1]))
@@ -17,7 +17,7 @@ def music_modifier(dic:dict,request:HttpRequest)->dict:
 def playlist_modifier(dic:dict,request:HttpRequest):
     image=execute("select image_url from musics,playlist_music where playlist_music.music_id=musics.id and musics.image_url is not null and playlist_id =%s limit 1 ",[dic["id"]])
     if(len(image[1])):
-        dic["image_url"]=request.get_host()+image[1][0][0]
+        dic["image_url"]="http://"+request.get_host()+image[1][0][0]
     else:
         dic["image_url"]=None
 
@@ -28,7 +28,7 @@ def playlist_modifier(dic:dict,request:HttpRequest):
 def album_modifier(dic:dict,request:HttpRequest):
     image=execute("select image_url from musics where  musics.image_url is  not null and album_id =%s limit 1 ",[dic["id"]])
     if(len(image[1])):
-        dic["image_url"]=request.get_host()+image[1][0][0]
+        dic["image_url"]="http://"+request.get_host()+image[1][0][0]
     else:
         dic["image_url"]=None
     musics_query=execute("select * from musics where id=%s",[dic["id"]])
@@ -37,7 +37,7 @@ def album_modifier(dic:dict,request:HttpRequest):
                            
 def user_modifier(dic:dict,request:HttpRequest):
     if(dic["image_url"]):
-        dic["image_url"]=request.get_host()+dic["image_url"]
+        dic["image_url"]="http://"+request.get_host()+dic["image_url"]
     else:
         dic["image_url"]=None
     if("password" in dic):
