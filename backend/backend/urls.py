@@ -63,7 +63,11 @@ urlpatterns = [
 
     path("musics/like",LikeMusic.as_view()),
     path("albums/like",LikeAlbums.as_view()),
-    path("playlists/like",LikePlaylists.as_view())
+    path("playlists/like",LikePlaylists.as_view()),
+
+    path("comments/<int:music_id>",GetComments.as_view()),
+    path("comment",Comment.as_view())
+
     
 
 

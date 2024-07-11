@@ -42,3 +42,6 @@ def user_modifier(dic:dict,request:HttpRequest):
         dic["image_url"]=None
     if("password" in dic):
         del dic["password"]
+
+def comment_modifier(dic:dict,request:HttpRequest):
+    dic["username"]=execute("select username from users where id=%s",[dic["user_id"]])

@@ -363,3 +363,27 @@ class AllSingers(AuthorizationMixin,APIView):
             return JsonResponse(serialize(singers[0],singers[1],user_modifier,request),safe=False)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class Comment(AuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+
+            data=json.loads(request.body)
+            stat,field=check(data,"music_id","text")
+            if( not stat):
+                return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+            execute("insert into musiccomments(music_id,user_id,text) values(%s,%s,%s)",[data.get("music_id"),request.COOKIES["id"],data.get("text")],False,True)
+            return JsonResponse({ "message":"added successfuly"},status=status.HTTP_200_OK)
+
+       
+
+class GetComments(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest,music_id):
+        try:
+            all_comments=execute("select * from musiccomments where music_id=%s",[music_id])
+            return JsonResponse(serialize(all_comments[0],all_comments[1],comment_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
