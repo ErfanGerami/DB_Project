@@ -130,9 +130,9 @@ class SingerAlbum(AuthorizationMixin,APIView):
         data=execute("select * from albums where singer_id = %s;",[str(singer_pk)])
         return JsonResponse(serialize(data[0],data[1],album_modifier,request),safe=False)
 class AlbumSong(AuthorizationMixin, APIView):
-    def get(self,request,album_pk):
-        data=execute("select * from musics where album_id = %s;",[str(album_pk)])
-        return JsonResponse(serialize(data[0],data[1],),safe=False)
+    def get(self,request,album_id):
+        data=execute("select * from albums where id = %s;",[str(album_id)])
+        return JsonResponse(serialize(data[0],data[1],album_modifier,request),safe=False)
     
 
 class UserPlaylist(AuthorizationMixin,APIView):

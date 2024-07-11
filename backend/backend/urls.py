@@ -36,7 +36,8 @@ urlpatterns = [
     path('concerts',Conecrts.as_view()),
     path('concerts/<int:pk>',Concert.as_view()),
 
-    path('album/<int:singer_pk>',SingerAlbum.as_view()),
+    
+    path('album/<int:album_id>',AlbumSong.as_view()),
 
     path('playlist/user',UserPlaylist.as_view()),
     path("playlists/<int:playlist_id>",PlaylistMusics.as_view()),
