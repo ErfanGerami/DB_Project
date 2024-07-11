@@ -109,8 +109,8 @@ def save_file(file,formats:list,dest_name,dest_path=""):
     return True,file_path
 def get_highest_id(table):
      id_query=execute(f"select MAX(id) from {table}")
-     if(len(id_query)[1]):
+     if(len(id_query[1])):
           
         return id_query[1][0][0]
      else:
-          return 1
+          return 0
