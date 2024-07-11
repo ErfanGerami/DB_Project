@@ -181,7 +181,7 @@ class AddToPLaylist(AuthorizationMixin,APIView):
             data=json.loads(request.body)
             if(len(execute("select * from playlists where id= %s and owner_id=%s ",[str(data.get("playlist_id")),request.COOKIES["id"]])[1])!=1):
                 return JsonResponse({ "message":"user doesnt have a playlist with that id"},status=status.HTTP_400_BAD_REQUEST)
-            if( not execute("select can_add_to_playlist from musics where id=%",[str(data.get("music_id"))])[1][0][0]):
+            if( not execute("select can_add_to_playlist from musics where id=%s",[str(data.get("music_id"))])[1][0][0]):
                 return JsonResponse({ "message": "singer prevented this from being added to a playlist"},status=status.HTTP_400_BAD_REQUEST)
             data=execute("insert into playlist_music values(%s,%s)",[str(data.get("music_id")),str(data.get("playlist_id"))],False,True)
             return JsonResponse({ "message":"added successfully"},status=status.HTTP_200_OK)
