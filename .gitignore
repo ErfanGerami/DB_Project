@@ -1,3 +1,4 @@
 env/
 __pycache__
 db_project_front
+*media
