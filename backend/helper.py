@@ -4,21 +4,23 @@ from backend.settings import SECRET_KEY,EXPIRATION_TIME
 from django.db import connection
 import hashlib
 
-def serialize(desc:tuple,inp:list):
+def serialize(desc:tuple,inp:list,function=lambda x, y: None,request=None):
     resp=list()
 
     for rec in inp:
         dic=dict()
         for i in range(len(desc)):
             dic[desc[i]]=rec[i]
+        function(dic,request)
         resp.append(dic)
     return resp
 
 
-def serialize_one(desc,inp:tuple):
+def serialize_one(desc,inp:tuple,function=lambda x, y: None,request=None):
     resp=dict()
     for i in range(len(desc)):
             resp[desc[i]]=inp[0][i]
+    function(resp,request)
     return resp
 def generate_jwt_token(username,password,id,email,birthdate,address,has_membership,money,is_singer):
     expiration = datetime.utcnow() + EXPIRATION_TIME

@@ -85,28 +85,28 @@ class Musics(AuthorizationMixin,APIView):
     def get(self,request):
         data=execute("select * from musics")
     
-        return JsonResponse(serialize(data[0],data[1]),safe=False)
+        return JsonResponse(serialize(data[0],data[1],music_modifier,request),safe=False)
 class Music( AuthorizationMixin,APIView):
     def get(self,request,pk):
         data=execute("select * from musics where id = %s;",[str(pk)])
         
-        return JsonResponse(serialize_one(data[0],data[1]),safe=False)
+        return JsonResponse(serialize_one(data[0],data[1],music_modifier,request),safe=False)
 
 class SingerAlbum(AuthorizationMixin,APIView):
     def get(self,request,singer_pk):
         data=execute("select * from albums where singer_id = %s;",[str(singer_pk)])
-        return JsonResponse(serialize(data[0],data[1]),safe=False)
+        return JsonResponse(serialize(data[0],data[1],album_modifier,request),safe=False)
 class AlbumSong(AuthorizationMixin, APIView):
     def get(self,request,album_pk):
         data=execute("select * from musics where album_id = %s;",[str(album_pk)])
-        return JsonResponse(serialize(data[0],data[1]),safe=False)
+        return JsonResponse(serialize(data[0],data[1],),safe=False)
     
 
 class UserPlaylist(AuthorizationMixin,APIView):
     def get(self,request):
         data=execute(" select * from get_users_playlists(%s)",[str(request.COOKIES["id"])])
         
-        return JsonResponse(serialize(data[0],data[1]),safe=False)
+        return JsonResponse(serialize(data[0],data[1],playlist_modifier,request),safe=False)
     
 class Playlist(AuthorizationMixin,APIView):
     def get(self,request,playlist_id):
@@ -115,27 +115,16 @@ class Playlist(AuthorizationMixin,APIView):
 
 class PlaylistMusics(AuthorizationMixin,APIView):
     def get(self,request,playlist_id):
-        data=execute("select * from playlists where id=%s and owner_id=%s",[playlist_id,request.COOKIES["id"]])
-        print(data)
-        l=serialize_one(data[0],data[1])
-        musics_query=execute("select image_url,musics.name,singer_id,music_id from musics,playlist_music,albums where musics.id=music_id and albums.id=musics.album_id and playlist_id=%s",[playlist_id])
-        l["musics"]=change(serialize(musics_query[0],musics_query[1]),
-                           "singer_name","singer_id","users","username")
-        for i in l["musics"]:
-            print(i)
-            i["liked"]=get_liked(i["music_id"],request.COOKIES["id"])
-        #for i in l["musics"]:
-
-        return JsonResponse(l,safe=False)
+        data=execute("select * from playlists where id=%s and owner_id=%s",[playlist_id,request.COOKIES["id"]])       
+        return JsonResponse(serialize_one(data[0],data[1],playlist_modifier,request),safe=False)
 
 class UserPredictions(AuthorizationMixin,APIView):
     def get(self,request):
         data=execute("select * from get_predictions(%s);",[str(request.COOKIES["id"])])
-        l=serialize(data[0],data[1])
-        for i in l:
-                i["liked"]=get_liked(i["music_id"],request.COOKIES["id"])
+        l=serialize(data[0],data[1],music_modifier,request)
+        
 
-        return JsonResponse(change(sorted(l, key=lambda x: x['rank']),"singer_name","singer_id","users","username"),safe=False)
+        return JsonResponse(sorted(l, key=lambda x: x['rank']),safe=False)
     
 
 class AddPLaylist(AuthorizationMixin,APIView):
@@ -261,15 +250,72 @@ class LikeMusic(AuthorizationMixin,APIView):
 class AllLikes(AuthorizationMixin,APIView):
     def get(self,request:HttpRequest):
         try:
-            musics_query=execute("select image_url,musics.name,singer_id,music_id from musics,musiclikes,albums where albums.id=musics.album_id and  musiclikes.music_id=musics.id and musiclikes.user_id=%s",[request.COOKIES["id"]])
-            musics=change(serialize(musics_query[0],musics_query[1]),
-                           "singer_name","singer_id","users","username")
-            
-            for i in musics:
-                i["liked"]=get_liked(i["music_id"],request.COOKIES["id"])
+            musics_query=execute("select image_url,musics.name,singer_id,music_id as id from musics,musiclikes,albums where albums.id=musics.album_id and  musiclikes.music_id=musics.id and musiclikes.user_id=%s",[request.COOKIES["id"]])
+            musics=serialize(musics_query[0],musics_query[1],music_modifier,request)
             return JsonResponse(musics,safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+class LikeAlbums(AuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"album_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("insert into albumlikes(album_id,user_id) values(%s,%s)",[data["album_id"],request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"liked"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"album_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("delete from albumlikes  where album_id=%s and user_id=%s",[data["album_id"],request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"disliked"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)     
+
+class AllLikesAlbums(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            albums=execute("select album_id as id,singer_id,name from albums,albumlikes where albumlikes.user_id=%s",[request.COOKIES["id"]])
+            return JsonResponse(serialize(albums[0],albums[1],album_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+class LikePlaylists(AuthorizationMixin,APIView):
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"playlist_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("insert into playlistlikes(playlist_id,user_id) values(%s,%s)",[data["playlist_id"],request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"liked"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"playlist_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("delete from playlistlikes  where plaaylist_id=%s and user_id=%s",[data["playlist_id"],request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"disliked"},status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
         
 
-
+class AllLikesPlaylists(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            playlists=execute("select id,is_public,name from playlists,playlistlikes where playlistlikes.user_id=%s",[request.COOKIES["id"]])
+            
+            return JsonResponse(serialize(playlists[0],playlists[1],playlist_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)

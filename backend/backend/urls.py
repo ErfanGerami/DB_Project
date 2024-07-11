@@ -33,7 +33,7 @@ urlpatterns = [
     path('concerts',Conecrts.as_view()),
     path('concerts/<int:pk>',Concert.as_view()),
     path('singer/album/<int:singer_pk>',SingerAlbum.as_view()),
-    path('album/<int:album_pk>',SingerAlbum.as_view()),
+    path('album/<int:singer_pk>',SingerAlbum.as_view()),
 
     path('playlist/user',UserPlaylist.as_view()),
     path("playlists/<int:playlist_id>",PlaylistMusics.as_view()),
@@ -44,8 +44,13 @@ urlpatterns = [
     path("singer/addalbum",AddAlbum.as_view()),#name
     path("singer/setaddtoplaylist/true",CanAddToPlaylist.as_view()),#music_id
     path("singer/setaddtoplaylist/false",CanAddToPlaylist.as_view()),#music_id
-    path("likes/all",AllLikes.as_view()),
-    path("like",LikeMusic.as_view())
+    path("musics/likes/all",AllLikes.as_view()),
+    path("albums/likes/all",AllLikesAlbums.as_view()),
+    path("playlists/likes/all",AllLikesPlaylists.as_view()),
+
+    path("musics/like",LikeMusic.as_view()),
+    path("albums/like",LikeAlbums.as_view()),
+    path("playlists/like",LikePlaylists.as_view())
     
 
 
