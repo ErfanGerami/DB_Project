@@ -91,7 +91,7 @@ def singer_register(request):
             return JsonResponse({'message':path},status=status.HTTP_400_BAD_REQUEST)
 
         post=request.POST
-        execute("insert into users(id,username,password,email,birthdate,address,image_url,is_singer) values(%s,%s,%s,%s,%s,%s,%s)",
+        execute("insert into users(id,username,password,email,birthdate,address,image_url,is_singer) values(%s,%s,%s,%s,%s,%s,%s,%s)",
                 [id,post["username"],hash(post["password"]),post["email"],post["birthdate"],post["address"],path,True],False,True)
                 
         return JsonResponse({ "message":"register successful"},status=status.HTTP_200_OK)
