@@ -7,7 +7,7 @@ def music_modifier(dic:dict,request:HttpRequest)->dict:
         dic["image_url"]=request.get_host()+dic["image_url"]
     else:
         dic["image_url"]=None
-    if(dic["audio_url"]):
+    if("audio_url" in dic and dic["audio_url"]):
         dic["audio_url"]=request.get_host()+dic["audio_url"]
     else:
         dic["audio_url"]=None
