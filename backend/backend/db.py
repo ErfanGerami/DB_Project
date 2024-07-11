@@ -31,7 +31,7 @@ def album_modifier(dic:dict,request:HttpRequest):
         dic["image_url"]="http://"+request.get_host()+image[1][0][0]
     else:
         dic["image_url"]=None
-    musics_query=execute("select * from musics where id=%s",[dic["id"]])
+    musics_query=execute("select * from musics where album_id=%s",[dic["id"]])
     dic["musics"]=serialize(musics_query[0],musics_query[1],music_modifier,request)
     dic["singer_name"]=execute("select username from albums,users where users.id=albums.singer_id and albums.id=%s",[dic["id"]])[1][0][0]
                            
