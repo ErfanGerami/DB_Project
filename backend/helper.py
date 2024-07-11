@@ -108,4 +108,9 @@ def save_file(file,formats:list,dest_name,dest_path=""):
             destination.write(chunk)
     return True,file_path
 def get_highest_id(table):
-     return execute(f"select MAX(id) from {table}")[1][0][0]
+     id_query=execute(f"select MAX(id) from {table}")
+     if(len(id_query)[1]):
+          
+        return id_query[1][0][0]
+     else:
+          return 1
