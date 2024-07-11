@@ -218,11 +218,11 @@ class AddMusic(SingerAuthorizationMixin,APIView):
                 
                 
             
-            res,image_path=save_file(request.FILES['image'],["jpg","png","jpeg","ico"],str(id),"musics")
+            res,image_path=save_file(request.FILES['image'],["jpg","png","jpeg","ico"],str(id),"/musics")
             if(not res):
                 return JsonResponse({'message':image_path},status=status.HTTP_400_BAD_REQUEST)
 
-            res,audio_path=save_file(request.FILES['audio'],["mp4","wav","mp3","wma","m4a","flac"],str(id),"audios")
+            res,audio_path=save_file(request.FILES['audio'],["mp4","wav","mp3","wma","m4a","flac"],str(id),"/audios")
             if(not res):
                 return JsonResponse({'message':audio_path},status=status.HTTP_400_BAD_REQUEST)
 

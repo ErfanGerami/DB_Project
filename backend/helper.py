@@ -101,7 +101,8 @@ def save_file(file,formats:list,dest_name,dest_path=""):
     if (file_extension[1:len(file_extension)].lower() not in formats ):
          return False,f"{file_extension[1:len(file_extension)]} is not expected"
     file_path=os.path.join(dest_path, dest_name+file_extension)
-    save_path = os.path.join(MEDIA_ROOT,file_path)
+    save_path = str(MEDIA_ROOT)+file_path
+    print(MEDIA_ROOT)
     with open(save_path, 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
