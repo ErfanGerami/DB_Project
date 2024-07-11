@@ -22,7 +22,12 @@ from django.http import JsonResponse,HttpResponse
 import jwt
 from datetime import datetime, timedelta
 from .settings import SECRET_KEY,EXPIRATION_TIME
-from .views import *          
+from .views import * 
+from backend.settings import DEBUG
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import path, include         
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/login',login),
@@ -63,3 +68,6 @@ urlpatterns = [
 
 
 ]
+
+if DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
