@@ -283,7 +283,7 @@ class LikeMusic(AuthorizationMixin,APIView):
 class AllLikes(AuthorizationMixin,APIView):
     def get(self,request:HttpRequest):
         try:
-            musics_query=execute("select image_url,musics.name,singer_id,music_id as id from musics,musiclikes,albums where albums.id=musics.album_id and  musiclikes.music_id=musics.id and musiclikes.user_id=%s",[request.COOKIES["id"]])
+            musics_query=execute("select image_url,musics.name,singer_id,music_id,image_url as id from musics,musiclikes,albums where albums.id=musics.album_id and  musiclikes.music_id=musics.id and musiclikes.user_id=%s",[request.COOKIES["id"]])
             musics=serialize(musics_query[0],musics_query[1],music_modifier,request)
             return JsonResponse(musics,safe=False)
         except Exception as e:

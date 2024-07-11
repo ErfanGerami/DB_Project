@@ -21,7 +21,7 @@ def playlist_modifier(dic:dict,request:HttpRequest):
     else:
         dic["image_url"]=None
 
-    musics_query=execute("select image_url,musics.name,singer_id,musics.id from musics,playlist_music,albums where musics.id=music_id and albums.id=musics.album_id and playlist_id=%s",[dic["id"]])
+    musics_query=execute("select image_url,musics.name,singer_id,musics.id,audio_url from musics,playlist_music,albums where musics.id=music_id and albums.id=musics.album_id and playlist_id=%s",[dic["id"]])
     dic["musics"]=serialize(musics_query[0],musics_query[1],music_modifier,request)
 
 
