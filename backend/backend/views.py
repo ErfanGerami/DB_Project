@@ -85,7 +85,7 @@ def singer_register(request):
                 
                 
             
-        res,path=save_file(request.FILES['image'],["jpg","png","jpeg","ico"],str(id),"images")
+        res,path=save_file(request.FILES['image'],["jpg","png","jpeg","ico"],str(id),"/images")
         print(res)
         if(not res):
             return JsonResponse({'message':path},status=status.HTTP_400_BAD_REQUEST)
