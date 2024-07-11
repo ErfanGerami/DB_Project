@@ -319,3 +319,14 @@ class AllLikesPlaylists(AuthorizationMixin,APIView):
             return JsonResponse(serialize(playlists[0],playlists[1],playlist_modifier,request),safe=False)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class AllSingers(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            singers=execute("select * from users where is_singer")
+            
+            return JsonResponse(serialize(singers[0],singers[1],user_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)

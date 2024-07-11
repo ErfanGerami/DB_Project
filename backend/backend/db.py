@@ -31,3 +31,10 @@ def album_modifier(dic:dict,request:HttpRequest):
     dic["musics"]=serialize(musics_query[0],musics_query[1],music_modifier,request)
     dic["singer_name"]=execute("select username from albums,users where users.id=albums.singer_id and albums.id=%s",[dic["id"]])[1][0][0]
                            
+def user_modifier(dic:dict,request:HttpRequest):
+    if(dic["image_url"]):
+        dic["image_url"]=request.get_host()+dic["image_url"]
+    else:
+        dic["image_url"]=None
+    if("password" in dic):
+        del dic["password"]
