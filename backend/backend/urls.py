@@ -27,12 +27,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/login',login),
     path('auth/register',register),
+    path('auth/singer/register',singer_register),
+
+    
     path('test',Test.as_view()),
     path('musics',Musics.as_view()),
     path('musics/<int:pk>',Music.as_view()),
     path('concerts',Conecrts.as_view()),
     path('concerts/<int:pk>',Concert.as_view()),
-    path('singer/album/<int:singer_pk>',SingerAlbum.as_view()),
+
     path('album/<int:singer_pk>',SingerAlbum.as_view()),
 
     path('playlist/user',UserPlaylist.as_view()),
@@ -40,6 +43,8 @@ urlpatterns = [
     path('userpredictions',UserPredictions.as_view()),
     path("addplaylist",AddPLaylist.as_view()),
     path("addtoplaylist",AddToPLaylist.as_view()),
+
+    path('singer/album/<int:singer_pk>',SingerAlbum.as_view()),
     path("singer/addmusic",AddMusic.as_view()),#file#album_id,name,genre,rangeage,image_url,text,can_add_to_playlist:optional
     path("singer/addalbum",AddAlbum.as_view()),#name
     path("singer/setaddtoplaylist/true",CanAddToPlaylist.as_view()),#music_id

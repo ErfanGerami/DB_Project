@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from backend.settings import SECRET_KEY,EXPIRATION_TIME
 from django.db import connection
 import hashlib
+from backend.settings import MAX_UPLOAD_SIZE,MEDIA_ROOT
+import os
 
 def serialize(desc:tuple,inp:list,function=lambda x, y: None,request=None):
     resp=list()
@@ -90,3 +92,19 @@ def change(data,new_name,table1_attrib:str,table2:str,table2_atttribs:str):
      
      
      
+def save_file(file,formats:list,dest_name,dest_path=""):
+    if file.size > MAX_UPLOAD_SIZE:
+            return False,"File size exceeds the maximum limit ."
+        
+    file_extension = os.path.splitext(file.name)[1]
+    print(file_extension)
+    if (file_extension[1:len(file_extension)].lower() not in formats ):
+         return False,f"{file_extension[1:len(file_extension)]} is not expected"
+    file_path=os.path.join(dest_path, dest_name+file_extension)
+    save_path = os.path.join(MEDIA_ROOT,file_path)
+    with open(save_path, 'wb+') as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+    return True,file_path
+def get_highest_id(table):
+     return execute(f"select MAX(id) from {table}")[1][0][0]
