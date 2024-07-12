@@ -624,13 +624,9 @@ class Search(AuthorizationMixin,APIView):
             res=execute("""select * from musics,albums,users
                             where musics.album_id=albums.id and users.id=albums.singer_id
                             and   users.username LIKE  %s and  musics.text  like %s and  musics.name  like %s
-                         """,[f"%{data["singer_name"]}%",f"%{data["text"]}%",f"%{data["music_name"]}%"])
-            print()
-            print()
-            print()
-            print()
-            print()
-            print(res)
+                         """,["%{i}%".format(i=data["singer_name"]),"%{i}%".format(i=data["text"]),"%{i}%".format(i=data["music_name"])])
+            
+     
             return JsonResponse(serialize(res[0],res[1],music_modifier,request),safe=False)
 
             
