@@ -107,8 +107,8 @@ class Test(AuthorizationMixin, APIView):
     
 class Conecrts(AuthorizationMixin,APIView):
     def get(self,request):
-        data=execute("select * from Concerts")
-        return JsonResponse(serialize(data[0],data[1]),safe=False)
+        data=execute("select * from concerts")
+        return JsonResponse(serialize(data[0],data[1],concert_modifier,request),safe=False)
 class Concert(AuthorizationMixin,APIView):
      def get(self,request,pk):
         data=execute("select * from concerts where id = %s;",[str(pk)])
@@ -530,3 +530,72 @@ class Chat(AuthorizationMixin,APIView):
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
 
 
+class Users(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            singers=execute("select * from users ")
+            
+            return JsonResponse(serialize(singers[0],singers[1],user_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class AddConcert(SingerAuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"date","price")
+
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            #check if usr is friend
+            execute("insert into concerts(singer_id,price,date) values(%s,%s,%s)",[request.COOKIES["id"],data.get("price"),data.get("date")],False,True)
+            return JsonResponse({ "message":"added"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+
+    
+    
+class BuyTicket(AuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"concert_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            if(execute("select has_suspended from concerts where id=%s",[data.get("concert_id")])[1][0][0]):
+                return JsonResponse({ "message":"concert is suspended"},status=status.HTTP_200_OK)
+            
+            money=int(execute("select money from users where id=%s",[request.COOKIES["id"]])[1][0][0])
+            price=int(execute("select price from concerts where id=%s",[data.get("concert_id")])[1][0][0])
+            
+            if(money<price):
+                return JsonResponse({ "message":"not enought money"},status=status.HTTP_200_OK)
+            execute("insert into ticket(user_id,concert_id) values(%s,%s)",[request.COOKIES["id"],data.get("concert_id")],False,True)
+            print(1)
+            return JsonResponse({ "message":"added"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+class SuspendConcert(SingerAuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"concert_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if(int(execute("select singer_id from concerts where id=%s",[data.get("concert_id")])[1][0][0])!=request.COOKIES["id"]):
+                return JsonResponse({ "message": "not your concert"},status=status.HTTP_400_BAD_REQUEST)
+            
+            execute("update   concerts set has_suspended=true where id=%s",[data.get("concert_id")],False,True)
+            return JsonResponse({ "message":"suspended"},status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)

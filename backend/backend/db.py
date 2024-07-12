@@ -52,3 +52,9 @@ def comment_modifier(dic:dict,request:HttpRequest):
 def friendrequest_modifier(dic:dict,request:HttpRequest):
     dic["reciever_name"]=execute("select username from users where id=%s",[dic["reciever_id"]])[1][0][0]
     dic["sender_name"]=execute("select username from users where id=%s",[dic["sender_id"]])[1][0][0]
+
+def concert_modifier(dic:dict,request:HttpRequest):
+    dic["singer_name"]=execute("select username from users where id=%s",[dic["singer_id"]])[1][0][0]
+    dic["ticket_count"]=execute("select count(*) from ticket where user_id=%s and concert_id=%s",[request.COOKIES["id"],dic["id"]])[1][0][0]
+
+    

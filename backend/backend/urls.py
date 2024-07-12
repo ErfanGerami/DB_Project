@@ -81,8 +81,16 @@ urlpatterns = [
     path("chatfriends",AllChatFriends.as_view()),
     path("chat/<int:user_id>",Chat.as_view()),
 
-    path("message",Message.as_view())
+    path("message",Message.as_view()),
     
+
+    path("users",Users.as_view()),
+    path("concert/add",AddConcert.as_view()),
+    path("concerts",Conecrts.as_view()),
+    path("concert/suspend",SuspendConcert.as_view()),
+    path("ticket/buy",BuyTicket.as_view()),
+
+
 
 
 ]
