@@ -616,15 +616,15 @@ class Deposit(AuthorizationMixin,APIView):
 class Search(AuthorizationMixin,APIView):
      def get(self,request:HttpRequest):
         data=request.GET
-        stat,field=check(data,"music_name","singer_name","text")
+        stat,field=check(data,"music_name","singer_name","text","genere")
 
         if( not stat):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
         try:
             res=execute("""select * from musics,albums,users
                             where musics.album_id=albums.id and users.id=albums.singer_id
-                            and   users.username LIKE  %s and  musics.text  like %s and  musics.name  like %s
-                         """,["%{i}%".format(i=data["singer_name"]),"%{i}%".format(i=data["text"]),"%{i}%".format(i=data["music_name"])])
+                            and   users.username LIKE  %s and  musics.text  like %s and  musics.name  like %s and genre like %s
+                         """,["%{i}%".format(i=data["singer_name"]),"%{i}%".format(i=data["text"]),"%{i}%".format(i=data["music_name"]),"%{i}%".format(i=data["genre"])])
             
      
             return JsonResponse(serialize(res[0],res[1],music_modifier,request),safe=False)
