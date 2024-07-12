@@ -574,7 +574,7 @@ class BuyTicket(AuthorizationMixin,APIView):
             price=int(execute("select price from concerts where id=%s",[data.get("concert_id")])[1][0][0])
             
             if(money<price):
-                return JsonResponse({ "message":"not enought money"},status=status.HTTP_200_OK)
+                return JsonResponse({ "message":"not enought money"},status=status.HTTP_400_BAD_REQUEST)
             execute("insert into ticket(user_id,concert_id) values(%s,%s)",[request.COOKIES["id"],data.get("concert_id")],False,True)
             print(1)
             return JsonResponse({ "message":"added"},status=status.HTTP_200_OK)
