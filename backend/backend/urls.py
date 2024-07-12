@@ -72,6 +72,10 @@ urlpatterns = [
     path("followers",ALLFollowers.as_view()),
     path("follow",Follow.as_view()),
 
+    path("friends",ALLFriendRealted.as_view()),
+    path("requestfriendship",RequestFriendship.as_view()),
+    path("acceptfriendship",RequestFriendship.as_view()),
+
     
 
 

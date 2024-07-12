@@ -428,3 +428,51 @@ class Follow(AuthorizationMixin,APIView):
             return JsonResponse({ "message":"unfollowed"},status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+class ALLFriendRealted(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            my_id=request.COOKIES["id"]
+            all_friendrequests=execute("""
+                                       (select sender_id,reciever_id,accepted,0 as type from friendrequests where not accepted and sender_id=%s)
+                                       union all
+                                       (select sender_id,reciever_id,accepted,1 as type from friendrequests where  accepted and sender_id=%s)
+                                       union all
+                                       (select sender_id,reciever_id,accepted,2 as type from friendrequests where not accepted and reciever_id=%s)
+                                       union all
+                                       (select sender_id,reciever_id,accepted,3 as type from friendrequests where  accepted and reciever_id=%s)
+                                       
+
+                                       """
+                                       ,[my_id,my_id,my_id,my_id])
+            
+            return JsonResponse(serialize(all_friendrequests[0],all_friendrequests[1],friendrequest_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST) 
+        
+
+class RequestFriendship(AuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"reciever_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("insert into friendrequests(sender_id,reciever_id) values(%s,%s)",[request.COOKIES["id"],data.get("reciever_id")],False,True)
+            return JsonResponse({ "message":"followed"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+class AcceptFriendRequest(AuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"sender_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("update friendrequests set accepted=true where sender_id=%s and reciever_id=%s",[data.get("sender_id").request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"followed"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)

@@ -48,3 +48,7 @@ def user_modifier(dic:dict,request:HttpRequest):
 
 def comment_modifier(dic:dict,request:HttpRequest):
     dic["username"]=execute("select username from users where id=%s",[dic["user_id"]])[1][0][0]
+
+def friendrequest_modifier(dic:dict,request:HttpRequest):
+    dic["reciever_name"]=execute("select username from users where id=%s",[dic["reciever_id"]])[1][0][0]
+    dic["sender_name"]=execute("select username from users where id=%s",[dic["sender_id"]])[1][0][0]
