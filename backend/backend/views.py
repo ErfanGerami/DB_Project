@@ -621,7 +621,7 @@ class Search(AuthorizationMixin,APIView):
         if( not stat):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
         try:
-            res=execute("""select image_url,musics.id,musics.name,audio_url,albums.singer_id from musics,albums,users
+            res=execute("""select musics.image_url,musics.id,musics.name,audio_url,albums.singer_id from musics,albums,users
                             where musics.album_id=albums.id and users.id=albums.singer_id
                             and   users.username LIKE  %s and  musics.text  like %s and  musics.name  like %s and genre like %s
                          """,["%{i}%".format(i=data["singer_name"]),"%{i}%".format(i=data["text"]),"%{i}%".format(i=data["music_name"]),"%{i}%".format(i=data["genre"])])
