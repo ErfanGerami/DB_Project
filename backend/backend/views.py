@@ -17,6 +17,8 @@ import os
 from .settings import MEDIA_ROOT,MAX_UPLOAD_SIZE
 from .db import *
 import os
+from django.utils.html import escape
+
 @api_view(['POST'])
 def login(request:HttpRequest):
     if(request.method=='POST'):
@@ -494,3 +496,37 @@ class GetUser(AuthorizationMixin,APIView):
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
         
+
+
+class Message(AuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"reciever_id")
+
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            #check if usr is friend
+            execute("insert into messages(sender_id,reciever_id,text) values(%s,%s,%s)",[request.COOKIES["id"],data.get("reciever_id"),escape(data.get("text"))],False,True)
+            return JsonResponse({ "message":"sent"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+class AllChatFriends(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            friends=execute("select  * from users,friendrequests where accepted and (friendrequests.sender_id=%s and friendrequests.reciever_id=users.id) or (friendrequests.sender_id=users.id and friendrequests.reciever_id=%s)",[request.COOKIES["id"],request.COOKIES["id"]])
+            return JsonResponse(serialize(friends[0],friends[1],user_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+class Chat(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest,user_id):
+        try:
+            messages=execute("select sender_id,text from messages where (%s,%s) in ((sender_id,reciever_id) ,(reciever_id,sender_id) ) order by time asc ",[request.COOKIES["id"],user_id])
+            return JsonResponse(serialize(messages[0],messages[1]),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+

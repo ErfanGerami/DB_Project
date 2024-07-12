@@ -78,6 +78,10 @@ urlpatterns = [
 
     path("account",GetUser.as_view()),
 
+    path("chatfriends",AllChatFriends.as_view()),
+    path("chat/<int:user_id>",Chat.as_view()),
+
+    path("message",Message.as_view())
     
 
 
