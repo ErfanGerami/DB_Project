@@ -2,6 +2,7 @@ from helper import *
 from django.http import HttpRequest
 #modifiers----------------
 def music_modifier(dic:dict,request:HttpRequest)->dict:
+    print(dic)
     dic["singer_name"]=execute("select username from musics,albums,users where users.id=albums.singer_id and musics.album_id=albums.id and musics.id=%s",[dic["id"]])[1][0][0]
     if(dic["image_url"]):
         dic["image_url"]="http://"+request.get_host()+dic["image_url"]
