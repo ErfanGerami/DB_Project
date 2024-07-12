@@ -45,4 +45,4 @@ def user_modifier(dic:dict,request:HttpRequest):
         del dic["password"]
 
 def comment_modifier(dic:dict,request:HttpRequest):
-    dic["username"]=execute("select username from users where id=%s",[dic["user_id"]])
+    dic["username"]=execute("select username from users where id=%s",[dic["user_id"]])[1][0][0]
