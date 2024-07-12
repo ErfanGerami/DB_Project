@@ -568,7 +568,7 @@ class BuyTicket(AuthorizationMixin,APIView):
         
         try:
             if(execute("select has_suspended from concerts where id=%s",[data.get("concert_id")])[1][0][0]):
-                return JsonResponse({ "message":"concert is suspended"},status=status.HTTP_200_OK)
+                return JsonResponse({ "message":"concert is suspended"},status=status.HTTP_400_BAD_REQUEST)
             
             money=int(execute("select money from users where id=%s",[request.COOKIES["id"]])[1][0][0])
             price=int(execute("select price from concerts where id=%s",[data.get("concert_id")])[1][0][0])
