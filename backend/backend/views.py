@@ -412,6 +412,9 @@ class Follow(AuthorizationMixin,APIView):
         stat,field=check(data,"user_id")
         if( not stat):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        if(int(request.COOKIES["id"])==int(data.get("user_id"))):
+            return JsonResponse({ "message": "follower and following can not be the same"},status=status.HTTP_400_BAD_REQUEST)
+
         try:
             execute("insert into followers values(%s,%s)",[request.COOKIES["id"],data.get("user_id")],False,True)
             return JsonResponse({ "message":"followed"},status=status.HTTP_200_OK)
@@ -458,6 +461,9 @@ class RequestFriendship(AuthorizationMixin,APIView):
         stat,field=check(data,"reciever_id")
         if( not stat):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        if(int(request.COOKIES["id"])==int(data.get("reciever_id"))):
+            return JsonResponse({ "message": "follower and following can not be the same"},status=status.HTTP_400_BAD_REQUEST)
+
         try:
             execute("insert into friendrequests(sender_id,reciever_id) values(%s,%s)",[request.COOKIES["id"],data.get("reciever_id")],False,True)
             return JsonResponse({ "message":"followed"},status=status.HTTP_200_OK)
