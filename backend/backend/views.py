@@ -485,7 +485,7 @@ class AcceptFriendRequest(AuthorizationMixin,APIView):
 class GetUser(AuthorizationMixin,APIView):
 
     def get(self,request:HttpRequest):
-        data=json.loads(request.body)
+        
         
         try:
             user=execute("select * from users where id=%s",[request.COOKIES["id"]])
