@@ -209,7 +209,7 @@ class AddMusic(SingerAuthorizationMixin,APIView):
             file_path=None
             
             post=request.POST
-            stat,field=check(post,"name","album_id","rangeage","text","genre")
+            stat,field=check(post,"name","album_id","rangeage","text","genre","can_add_to_playlist")
             
             if( not stat):
                 return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
@@ -229,9 +229,7 @@ class AddMusic(SingerAuthorizationMixin,APIView):
             if(not res):
                 return JsonResponse({'message':audio_path},status=status.HTTP_400_BAD_REQUEST)
 
-            can_add=True
-            if("can_add_to_playlist" in post and not post["can_add_to_playlist" ]):
-                can_add=False
+            can_add=post["can_add_to_playlist"]
                 
             execute("insert into musics(id,album_id,name,genre,rangeage,can_add_to_playlist,text,image_url,audio_url) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                         [id,post["album_id"],post["name"],post["genre"],post["rangeage"],can_add,post["text"],image_path,audio_path],False,True)
