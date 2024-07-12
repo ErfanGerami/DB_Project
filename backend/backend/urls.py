@@ -70,6 +70,7 @@ urlpatterns = [
 
     path("followings",ALLFollowings.as_view()),
     path("followers",ALLFollowers.as_view()),
+    path("follow",Follow.as_view()),
 
     
 

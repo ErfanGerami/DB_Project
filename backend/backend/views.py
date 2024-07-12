@@ -405,3 +405,26 @@ class ALLFollowings(AuthorizationMixin,APIView):
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
 
+class Follow(AuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"user_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("insert into followers values(%s,%s)",[request.COOKIES["id"],data.get("user_id")],False,True)
+            return JsonResponse({ "message":"followed"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"user_id")
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            execute("delete from followers  where user_id=%s and follower_id=%s",[data.get("user_id"),request.COOKIES["id"]],False,True)
+            return JsonResponse({ "message":"unfollowed"},status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
