@@ -611,6 +611,7 @@ class Deposit(AuthorizationMixin,APIView):
         
         try:
             execute("update users set money= money + %s where id=%s",[data.get("money"),request.COOKIES["id"]],False,True)
-        
+            return JsonResponse({"message":"added"},status=status.HTTP_200_OK)
+
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
