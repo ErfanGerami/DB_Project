@@ -472,7 +472,7 @@ class AcceptFriendRequest(AuthorizationMixin,APIView):
         if( not stat):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
         try:
-            execute("update friendrequests set accepted=true where sender_id=%s and reciever_id=%s",[data.get("sender_id").request.COOKIES["id"]],False,True)
+            execute("update friendrequests set accepted=true where sender_id=%s and reciever_id=%s",[data.get("sender_id"),request.COOKIES["id"]],False,True)
             return JsonResponse({ "message":"followed"},status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)

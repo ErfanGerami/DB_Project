@@ -74,7 +74,7 @@ urlpatterns = [
 
     path("friends",ALLFriendRealted.as_view()),
     path("requestfriendship",RequestFriendship.as_view()),
-    path("acceptfriendship",RequestFriendship.as_view()),
+    path("acceptfriendship",AcceptFriendRequest.as_view()),
 
     
 
