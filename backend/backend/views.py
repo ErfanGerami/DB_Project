@@ -600,7 +600,7 @@ class SuspendConcert(SingerAuthorizationMixin,APIView):
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
         
-class SuspendConcert(AuthorizationMixin,APIView):
+class Deposit(AuthorizationMixin,APIView):
 
     def post(self,request:HttpRequest):
         data=json.loads(request.body)
