@@ -613,3 +613,28 @@ class Deposit(AuthorizationMixin,APIView):
 
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+class Search(AuthorizationMixin,APIView):
+     def get(self,request:HttpRequest):
+        data=request.GET
+        stat,field=check(data,"music_name","singer_name","text")
+
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            res=execute("""select * from musics,albums,users
+                            where musics.album_id=albums.id and users.id=albums.singer_id
+                            and   users.username LIKE  %s and  musics.text  like %s and  musics.name  like %s
+                         """,[f"%{data["singer_name"]}%",f"%{data["text"]}%",f"%{data["music_name"]}%"])
+            print()
+            print()
+            print()
+            print()
+            print()
+            print(res)
+            return JsonResponse(serialize(res[0],res[1],music_modifier,request),safe=False)
+
+            
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+            

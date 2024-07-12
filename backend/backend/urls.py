@@ -90,8 +90,9 @@ urlpatterns = [
     path("concert/suspend",SuspendConcert.as_view()),
     path("ticket/buy",BuyTicket.as_view()),
 
-    path("deposit",Deposit.as_view())
+    path("deposit",Deposit.as_view()),
 
+    path("search",Search.as_view())
 
 
 
