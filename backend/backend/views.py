@@ -462,7 +462,7 @@ class RequestFriendship(AuthorizationMixin,APIView):
         if( not stat):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
         if(int(request.COOKIES["id"])==int(data.get("reciever_id"))):
-            return JsonResponse({ "message": "follower and following can not be the same"},status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({ "message": "cant send a request to yourself"},status=status.HTTP_400_BAD_REQUEST)
 
         try:
             execute("insert into friendrequests(sender_id,reciever_id) values(%s,%s)",[request.COOKIES["id"],data.get("reciever_id")],False,True)
@@ -482,3 +482,14 @@ class AcceptFriendRequest(AuthorizationMixin,APIView):
             return JsonResponse({ "message":"followed"},status=status.HTTP_200_OK)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+class GetUser(AuthorizationMixin,APIView):
+
+    def get(self,request:HttpRequest):
+        data=json.loads(request.body)
+        
+        try:
+            user=execute("select * from users where id=%s",[request.COOKIES["id"]])
+            return JsonResponse(serialize_one(user[0],user[1],user_modifier,request),status=status.HTTP_200_OK)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        

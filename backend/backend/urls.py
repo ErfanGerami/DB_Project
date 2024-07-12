@@ -76,6 +76,8 @@ urlpatterns = [
     path("requestfriendship",RequestFriendship.as_view()),
     path("acceptfriendship",AcceptFriendRequest.as_view()),
 
+    path("account",GetUser.as_view()),
+
     
 
 
