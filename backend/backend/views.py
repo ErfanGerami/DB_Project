@@ -463,7 +463,7 @@ class RequestFriendship(AuthorizationMixin,APIView):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
         if(int(request.COOKIES["id"])==int(data.get("reciever_id"))):
             return JsonResponse({ "message": "cant send a request to yourself"},status=status.HTTP_400_BAD_REQUEST)
-        if(len(execute("select * from friendrequests where  reciever_id=%s sender_id=%s",[request.COOKIES["id"],data.get("reciever_id")])[1])):
+        if(len(execute("select * from friendrequests where  reciever_id=%s and sender_id=%s",[request.COOKIES["id"],data.get("reciever_id")])[1])):
             return JsonResponse({ "message": "there is already a friendrequest betwean these two users"},status=status.HTTP_400_BAD_REQUEST)
 
         try:
