@@ -599,3 +599,18 @@ class SuspendConcert(SingerAuthorizationMixin,APIView):
 
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+class SuspendConcert(AuthorizationMixin,APIView):
+
+    def post(self,request:HttpRequest):
+        data=json.loads(request.body)
+        stat,field=check(data,"money")
+
+        if( not stat):
+            return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            execute("update users set money= money + %s where id=%s",[data.get("money"),request.COOKIES["id"]],False,True)
+        
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
