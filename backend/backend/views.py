@@ -524,7 +524,7 @@ class AllChatFriends(AuthorizationMixin,APIView):
 class Chat(AuthorizationMixin,APIView):
     def get(self,request:HttpRequest,user_id):
         try:
-            messages=execute("select messages.id,sender_id,text,username from messages where users.id=sender_id  (%s,%s) in ((sender_id,reciever_id) ,(reciever_id,sender_id) ) order by time asc ",[request.COOKIES["id"],user_id])
+            messages=execute("select messages.id,sender_id,text,username from messages,users where users.id=sender_id  (%s,%s) in ((sender_id,reciever_id) ,(reciever_id,sender_id) ) order by time asc ",[request.COOKIES["id"],user_id])
             return JsonResponse(serialize(messages[0],messages[1]),safe=False)
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
