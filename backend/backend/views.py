@@ -616,7 +616,7 @@ class Deposit(AuthorizationMixin,APIView):
 class Search(AuthorizationMixin,APIView):
      def get(self,request:HttpRequest):
         data=request.GET
-        stat,field=check(data,"music_name","singer_name","text","genere")
+        stat,field=check(data,"music_name","singer_name","text","genre")
 
         if( not stat):
             return JsonResponse({"message":f"{field} is required"},status=status.HTTP_400_BAD_REQUEST)
