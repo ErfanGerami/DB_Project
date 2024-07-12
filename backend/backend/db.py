@@ -37,6 +37,8 @@ def album_modifier(dic:dict,request:HttpRequest):
     dic["singer_name"]=execute("select username from albums,users where users.id=albums.singer_id and albums.id=%s",[dic["id"]])[1][0][0]
                            
 def user_modifier(dic:dict,request:HttpRequest):
+    print
+    dic["is_followed"]=bool(len(execute("select from followers where follower_id=%s and user_id=%s",[request.COOKIES["id"],dic["id"]])[1]))
     if(dic["image_url"]):
         dic["image_url"]="http://"+request.get_host()+dic["image_url"]
     else:

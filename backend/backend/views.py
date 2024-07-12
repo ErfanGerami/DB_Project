@@ -101,7 +101,7 @@ def singer_register(request):
 class Test(AuthorizationMixin, APIView):
     def post(self, request:HttpRequest, *args, **kwargs):
         # Your logic here
-        return JsonResponse({"user": request.COOKIES["username"]})
+        return JsonResponse({"user_id": request.COOKIES["id"]})
     
 class Conecrts(AuthorizationMixin,APIView):
     def get(self,request):
@@ -387,3 +387,21 @@ class GetComments(AuthorizationMixin,APIView):
         except Exception as e:
             return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
         
+class ALLFollowers(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            followers=execute("select * from users,followers where users.id=followers.follower_id and followers.user_id=%s",[request.COOKIES["id"]])
+            
+            return JsonResponse(serialize(followers[0],followers[1],user_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+class ALLFollowings(AuthorizationMixin,APIView):
+    def get(self,request:HttpRequest):
+        try:
+            folloings=execute("select * from users,followers where users.id=followers.user_id and followers.follower_id=%s",[request.COOKIES["id"]])
+            
+            return JsonResponse(serialize(folloings[0],folloings[1],user_modifier,request),safe=False)
+        except Exception as e:
+            return JsonResponse({ "message": str(e)},status=status.HTTP_400_BAD_REQUEST)
+

@@ -66,7 +66,10 @@ urlpatterns = [
     path("playlists/like",LikePlaylists.as_view()),
 
     path("comments/<int:music_id>",GetComments.as_view()),
-    path("comment",Comment.as_view())
+    path("comment",Comment.as_view()),
+
+    path("followings",ALLFollowings.as_view()),
+    path("followers",ALLFollowers.as_view()),
 
     
 
