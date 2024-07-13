@@ -39,6 +39,8 @@ MAX_UPLOAD_SIZE = 10 * 1024 * 1024
 
 INSTALLED_APPS = [
     'corsheaders',
+'django_crontab',
+    'backend',
 
     'rest_framework',
     'django.contrib.admin',
@@ -148,3 +150,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #mine------------------------------
 EXPIRATION_TIME=timedelta(minutes=100000)
+CRON_CLASSES = [
+    'yourapp.cron.PredictionsCronJob',
+]
